@@ -1,3 +1,5 @@
+const ENDPONT_URL = 'http://localhost:9000/graphql';
+
 const metadata = {
   method: 'POST',
   headers: {
@@ -7,24 +9,43 @@ const metadata = {
 
 const graphqlGetJobsQuery = {
   query: `
-        query {
-            jobs {
-                id
-                title
-                company {
-                    id
-                    name
-                }
-            }
-        } `,
+  query {
+    jobs {
+      id
+      title
+      company {
+        id
+        name
+      }
+    }
+  }
+  `,
 };
 
-async function getJobs(url) {
-  const reponse = await fetch(url, {
+const graphqlGetJobQuery = {
+  query: `
+  query {
+    job
+  }
+  `
+}
+
+async function getJobs() {
+  const reponse = await fetch(ENDPONT_URL, {
     ...metadata,
     body: JSON.stringify(graphqlGetJobsQuery),
   });
   const { data } = await reponse.json();
   return data;
 }
-export { getJobs };
+
+async function getJob(url) {
+  const reponse = await fetch(ENDPONT_URL, {
+    ...metadata,
+    body: JSON.stringify(graphqlGetJobsQuery),
+  });
+  const { data } = await reponse.json();
+  return data;
+}
+
+export { getJobs, getJob };

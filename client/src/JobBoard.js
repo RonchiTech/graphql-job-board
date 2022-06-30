@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { JobList } from './JobList';
 import { getJobs } from './requests';
 
-const ENDPONT_URL = 'http://localhost:9000/graphql';
+
 export class JobBoard extends Component {
   constructor() {
     super();
@@ -12,7 +12,7 @@ export class JobBoard extends Component {
   }
   async componentDidMount() {
     // const fetchJobs = async () => {
-      const { jobs } = await getJobs(ENDPONT_URL);
+      const { jobs } = await getJobs();
       this.setState({ jobs: jobs });
     // };
     // fetchJobs();
