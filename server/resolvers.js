@@ -6,6 +6,7 @@ exports.Query = {
 
 exports.Job = {
   company: (job) => {
-    console.log(job);
-    return db.companies.get(job.companyId)},
+    // console.log(job);
+    return db.companies.get(job.companyId);
+  },
 };
