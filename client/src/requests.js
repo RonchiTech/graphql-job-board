@@ -7,45 +7,76 @@ const metadata = {
   },
 };
 
-const graphqlGetJobsQuery = {
-  query: `
-  query {
-    jobs {
-      id
-      title
-      company {
+async function getJobs() {
+  const graphqlGetJobsQuery = {
+    query: `
+      query GetJobs{
+        jobs {
+          id
+          title
+          company {
+            id
+            name
+          }
+        }
+      }
+  `,
+  };
+  const reponse = await fetch(ENDPONT_URL, {
+    ...metadata,
+    body: JSON.stringify(graphqlGetJobsQuery),
+  });
+  const { data } = await reponse.json();
+  return data;
+}
+
+async function getJob(jobId) {
+  const graphqlGetJobQuery = {
+    query: `
+      query JobQuery($jobId: ID!) {
+        job(id: $jobId) {
+          id
+          title
+          company {
+            id
+            name
+          }
+          description
+        }
+      }
+    `,
+    variables: {
+      jobId: jobId,
+    },
+  };
+  const reponse = await fetch(ENDPONT_URL, {
+    ...metadata,
+    body: JSON.stringify(graphqlGetJobQuery),
+  });
+  const responseBody = await reponse.json();
+  return responseBody.data.job;
+}
+
+async function getCompany(companyId) {
+  const graphqlGetCompanyQuery = {
+    query: `query GetCompany($companyId: ID!){
+      company(id: $companyId){
         id
         name
+        description
       }
-    }
-  }
-  `,
-};
-
-const graphqlGetJobQuery = {
-  query: `
-  query {
-    job
-  }
-  `
-}
-
-async function getJobs() {
-  const reponse = await fetch(ENDPONT_URL, {
+    }`,
+    variables: {
+      companyId,
+    },
+  };
+  const response = await fetch(ENDPONT_URL, {
     ...metadata,
-    body: JSON.stringify(graphqlGetJobsQuery),
+    body: JSON.stringify(graphqlGetCompanyQuery),
   });
-  const { data } = await reponse.json();
-  return data;
+  const responseBody = await response.json();
+  console.log(responseBody);
+  return responseBody.data.company;
 }
 
-async function getJob(url) {
-  const reponse = await fetch(ENDPONT_URL, {
-    ...metadata,
-    body: JSON.stringify(graphqlGetJobsQuery),
-  });
-  const { data } = await reponse.json();
-  return data;
-}
-
-export { getJobs, getJob };
+export { getJobs, getJob, getCompany };
