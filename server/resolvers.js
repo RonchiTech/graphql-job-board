@@ -1,4 +1,5 @@
+const db = require('./db');
+const jobs = require('./data/jobs.json');
 exports.Query = {
-  greetings: () => 'Hello World!',
+  jobs: () => db.jobs.list(),
 };
-
