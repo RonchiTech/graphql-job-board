@@ -1,5 +1,11 @@
 const db = require('./db');
-const jobs = require('./data/jobs.json');
+
 exports.Query = {
   jobs: () => db.jobs.list(),
+};
+
+exports.Job = {
+  company: (job) => {
+    console.log(job);
+    return db.companies.get(job.companyId)},
 };
