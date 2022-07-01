@@ -1,15 +1,19 @@
 const ENDPONT_URL = 'http://localhost:9000/graphql';
 
-const metadata = {
-  method: 'POST',
-  headers: {
-    'content-type': 'application/json',
-  },
-};
+async function fetchData(query, variables = {}) {
+  const response = await fetch(ENDPONT_URL, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify({ query, variables }),
+  });
+  const responseData = await response.json();
+  return responseData;
+}
 
 async function getJobs() {
-  const graphqlGetJobsQuery = {
-    query: `
+  const query = `
       query GetJobs{
         jobs {
           id
@@ -20,19 +24,21 @@ async function getJobs() {
           }
         }
       }
-  `,
-  };
-  const reponse = await fetch(ENDPONT_URL, {
-    ...metadata,
-    body: JSON.stringify(graphqlGetJobsQuery),
-  });
-  const { data } = await reponse.json();
-  return data;
+  `;
+  const responseData = await fetchData(query);
+
+  if (responseData.errors) {
+    const errorMessages = responseData.errors
+      .map((error) => error.message)
+      .join('\n');
+    throw new Error(errorMessages);
+  }
+  
+  return responseData.data;
 }
 
 async function getJob(jobId) {
-  const graphqlGetJobQuery = {
-    query: `
+  const query = `
       query JobQuery($jobId: ID!) {
         job(id: $jobId) {
           id
@@ -44,38 +50,21 @@ async function getJob(jobId) {
           description
         }
       }
-    `,
-    variables: {
-      jobId: jobId,
-    },
-  };
-  const reponse = await fetch(ENDPONT_URL, {
-    ...metadata,
-    body: JSON.stringify(graphqlGetJobQuery),
-  });
-  const responseBody = await reponse.json();
+    `;
+  const responseBody = await fetchData(query, { jobId });
   return responseBody.data.job;
 }
 
 async function getCompany(companyId) {
-  const graphqlGetCompanyQuery = {
-    query: `query GetCompany($companyId: ID!){
+  const query = `query GetCompany($companyId: ID!){
       company(id: $companyId){
         id
         name
         description
       }
-    }`,
-    variables: {
-      companyId,
-    },
-  };
-  const response = await fetch(ENDPONT_URL, {
-    ...metadata,
-    body: JSON.stringify(graphqlGetCompanyQuery),
-  });
-  const responseBody = await response.json();
-  console.log(responseBody);
+    }`;
+
+  const responseBody = await fetchData(query, { companyId });
   return responseBody.data.company;
 }
 

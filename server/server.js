@@ -22,12 +22,18 @@ app.use(
 );
 //Get the schema.graphql path
 const schemaPath = path.join(__dirname, '.', 'schema.graphql');
+
 //Read the file
 const typeDefs = gql(fs.readFileSync(schemaPath, { encoding: 'utf8' }));
+
 //import the resolver object
 const resolvers = require('./resolvers');
+
 // console.log(resolvers) = {Query:{...}, Job:{...}}
+
+
 const apolloServer = new ApolloServer({ typeDefs, resolvers });
+
 //Apply the app middleware to the apolloServer
 apolloServer.applyMiddleware({ app, path: '/graphql' });
 
