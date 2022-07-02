@@ -31,4 +31,11 @@ const Job = {
   },
 };
 
-module.exports = { Query, Job };
+const Company = {
+  //company = root
+  jobs: (company) => {
+    return db.jobs.list().filter((job) => job.companyId === company.id);
+  },
+};
+
+module.exports = { Query, Job, Company };
