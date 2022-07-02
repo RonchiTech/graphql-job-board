@@ -33,7 +33,7 @@ async function getJobs() {
       .join('\n');
     throw new Error(errorMessages);
   }
-  
+
   return responseData.data;
 }
 
@@ -72,4 +72,20 @@ async function getCompany(companyId) {
   return responseBody.data.company;
 }
 
-export { getJobs, getJob, getCompany };
+async function createJob(input) {
+  const mutation = `mutation CreateJob($input: CreateJobInput) {
+    job: createJob(input: $input){
+      id
+      title
+      description
+      company {
+        id 
+        name
+      }
+    }
+  }`;
+  const responseBody = await fetchData(mutation, { input });
+  return responseBody.data.job;
+}
+
+export { getJobs, getJob, getCompany, createJob };
