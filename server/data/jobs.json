@@ -16,5 +16,17 @@
     "companyId": "SJV0-wdOM",
     "title": "Full-Stack Developer",
     "description": "We are looking for a Full-Stack Developer familiar with Node.js, Express, and React."
+  },
+  {
+    "id": "BJ0t3_aqq",
+    "companyId": "SJV0-wdOM",
+    "title": "DevOps",
+    "description": "Can also do Full Stack"
+  },
+  {
+    "id": "By2lMKT55",
+    "companyId": "SJV0-wdOM",
+    "title": "Sr. DevOps",
+    "description": "Can also do Full Stack"
   }
 ]
