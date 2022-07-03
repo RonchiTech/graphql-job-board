@@ -14,7 +14,7 @@ const jwtSecret = Buffer.from('Zn8Q5tyZ/G1MHltc4F/gTkVJMlrbKiZt', 'base64');
 const app = express();
 app.use(
   cors(),
-  bodyParser.json(),
+  express.json(),
   expressJwt({
     secret: jwtSecret,
     credentialsRequired: false,
@@ -32,7 +32,13 @@ const resolvers = require('./resolvers');
 // console.log(resolvers) = {Query:{...}, Job:{...}}
 
 
-const apolloServer = new ApolloServer({ typeDefs, resolvers });
+const context = (context) => {
+  return {
+    user: context.req.user,
+  };
+};
+
+const apolloServer = new ApolloServer({ typeDefs, resolvers, context });
 
 //Apply the app middleware to the apolloServer
 apolloServer.applyMiddleware({ app, path: '/graphql' });
