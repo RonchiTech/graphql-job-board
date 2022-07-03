@@ -4,7 +4,7 @@ import { createJob } from './requests';
 export class JobForm extends Component {
   constructor(props) {
     super(props);
-    this.state = { title: '', description: '', companyId: 'RFz1-qm22' };
+    this.state = { title: '', description: '', };
   }
 
   handleChange(event) {

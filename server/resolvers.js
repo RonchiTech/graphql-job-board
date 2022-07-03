@@ -8,7 +8,7 @@ const Mutation = {
       throw new Error('Unauthorized!');
     }
     // const { companyId, title, description } = args.input; //data are stored in the "input" object
-    const newJobId = db.jobs.create(args.input); //return a jobId
+    const newJobId = db.jobs.create({...args.input, companyId: context.user.companyId}); //return a jobId
     return db.jobs.get(newJobId);
     // return null;
   },

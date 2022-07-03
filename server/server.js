@@ -34,7 +34,7 @@ const resolvers = require('./resolvers');
 
 const context = (context) => {
   return {
-    user: context.req.user,
+    user: context.req.user && db.users.get(context.req.user.sub),
   };
 };
 

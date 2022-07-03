@@ -52,5 +52,23 @@
     "companyId": "RFz1-qm22",
     "title": "QA Testing",
     "description": "5 years of experience"
+  },
+  {
+    "id": "SJXJtn0q9",
+    "title": "HR Manager",
+    "description": "Insert descriptions...",
+    "companyId": "SJV0-wdOM"
+  },
+  {
+    "id": "ryO8FnA55",
+    "title": "CEO",
+    "description": "Can lead us to glory!",
+    "companyId": "SJV0-wdOM"
+  },
+  {
+    "id": "BJOKj30c9",
+    "title": "General Manager",
+    "description": "IDK...",
+    "companyId": "HJRa-DOuG"
   }
 ]
