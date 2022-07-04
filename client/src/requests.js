@@ -1,6 +1,12 @@
-import { isLoggedIn, getAccessToken } from "./auth";
+import { ApolloClient, HttpLink, InMemoryCache } from 'apollo-boost';
+import { isLoggedIn, getAccessToken } from './auth';
 
 const ENDPONT_URL = 'http://localhost:9000/graphql';
+
+const client = new ApolloClient({
+  link: new HttpLink({ uri: ENDPONT_URL }),
+  cache: new InMemoryCache(),
+});
 
 async function fetchData(query, variables = {}) {
   const metadata = {
@@ -11,9 +17,8 @@ async function fetchData(query, variables = {}) {
     body: JSON.stringify({ query, variables }),
   };
 
-  if(isLoggedIn()) {
+  if (isLoggedIn()) {
     metadata.headers['authorization'] = 'Bearer ' + getAccessToken();
-    
   }
 
   const response = await fetch(ENDPONT_URL, metadata);
