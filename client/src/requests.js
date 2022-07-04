@@ -1,31 +1,50 @@
-import { ApolloClient, HttpLink, InMemoryCache } from 'apollo-boost';
+import {
+  ApolloClient,
+  ApolloLink,
+  HttpLink,
+  InMemoryCache,
+} from 'apollo-boost';
 import gql from 'graphql-tag';
 import { isLoggedIn, getAccessToken } from './auth';
 
 const ENDPONT_URL = 'http://localhost:9000/graphql';
 
+const authLink = new ApolloLink((operation, forward) => {
+  if (isLoggedIn()) {
+    // metadata.headers['authorization'] = 'Bearer ' + getAccessToken();
+    operation.setContext({
+      headers: {
+        Authorization: 'Bearer ' + getAccessToken(),
+      },
+    });
+  }
+  console.log('operation ', operation);
+  console.log('forward ', forward);
+  return forward(operation);
+});
+
 const client = new ApolloClient({
-  link: new HttpLink({ uri: ENDPONT_URL }),
+  link: ApolloLink.from([authLink, new HttpLink({ uri: ENDPONT_URL })]),
   cache: new InMemoryCache(),
 });
 
-async function fetchData(query, variables = {}) {
-  const metadata = {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({ query, variables }),
-  };
+// async function fetchData(query, variables = {}) {
+//   const metadata = {
+//     method: 'POST',
+//     headers: {
+//       'content-type': 'application/json',
+//     },
+//     body: JSON.stringify({ query, variables }),
+//   };
 
-  if (isLoggedIn()) {
-    metadata.headers['authorization'] = 'Bearer ' + getAccessToken();
-  }
+//   if (isLoggedIn()) {
+//     metadata.headers['authorization'] = 'Bearer ' + getAccessToken();
+//   }
 
-  const response = await fetch(ENDPONT_URL, metadata);
-  const responseData = await response.json();
-  return responseData;
-}
+//   const response = await fetch(ENDPONT_URL, metadata);
+//   const responseData = await response.json();
+//   return responseData;
+// }
 
 async function getJobs() {
   const query = gql`
