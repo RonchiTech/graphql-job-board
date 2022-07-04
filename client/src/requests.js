@@ -1,4 +1,5 @@
 import { ApolloClient, HttpLink, InMemoryCache } from 'apollo-boost';
+import gql from 'graphql-tag';
 import { isLoggedIn, getAccessToken } from './auth';
 
 const ENDPONT_URL = 'http://localhost:9000/graphql';
@@ -27,51 +28,56 @@ async function fetchData(query, variables = {}) {
 }
 
 async function getJobs() {
-  const query = `
-      query GetJobs{
-        jobs {
+  const query = gql`
+    query GetJobs {
+      jobs {
+        id
+        title
+        company {
           id
-          title
-          company {
-            id
-            name
-          }
+          name
         }
       }
+    }
   `;
-  const responseData = await fetchData(query);
+  const response = await client.query({ query });
+  console.log('getJobs: ', response);
+  // const responseData = await fetchData(query);
 
-  if (responseData.errors) {
-    const errorMessages = responseData.errors
-      .map((error) => error.message)
-      .join('\n');
-    throw new Error(errorMessages);
-  }
+  // if (responseData.errors) {
+  //   const errorMessages = responseData.errors
+  //     .map((error) => error.message)
+  //     .join('\n');
+  //   throw new Error(errorMessages);
+  // }
 
-  return responseData.data;
+  return response.data;
 }
 
 async function getJob(jobId) {
-  const query = `
-      query JobQuery($jobId: ID!) {
-        job(id: $jobId) {
+  const query = gql`
+    query JobQuery($jobId: ID!) {
+      job(id: $jobId) {
+        id
+        title
+        company {
           id
-          title
-          company {
-            id
-            name
-          }
-          description
+          name
         }
+        description
       }
-    `;
-  const responseBody = await fetchData(query, { jobId });
-  return responseBody.data.job;
+    }
+  `;
+  // const responseBody = await fetchData(query, { jobId });
+  // return responseBody.data.job;
+  const response = await client.query({ query, variables: { jobId } });
+  return response.data.job;
 }
 
 async function getCompany(companyId) {
-  const query = `query GetCompany($companyId: ID!){
-      company(id: $companyId){
+  const query = gql`
+    query GetCompany($companyId: ID!) {
+      company(id: $companyId) {
         id
         name
         description
@@ -80,26 +86,33 @@ async function getCompany(companyId) {
           title
         }
       }
-    }`;
+    }
+  `;
 
-  const responseBody = await fetchData(query, { companyId });
-  return responseBody.data.company;
+  // const responseBody = await fetchData(query, { companyId });
+  // return responseBody.data.company;
+  const response = await client.query({ query, variables: { companyId } });
+  return response.data.company;
 }
 
 async function createJob(input) {
-  const mutation = `mutation CreateJob($input: CreateJobInput) {
-    job: createJob(input: $input){
-      id
-      title
-      description
-      company {
-        id 
-        name
+  const mutation = gql`
+    mutation CreateJob($input: CreateJobInput) {
+      job: createJob(input: $input) {
+        id
+        title
+        description
+        company {
+          id
+          name
+        }
       }
     }
-  }`;
-  const responseBody = await fetchData(mutation, { input });
-  return responseBody.data.job;
+  `;
+  // const responseBody = await fetchData(mutation, { input });
+  // return responseBody.data.job;
+  const response = await client.mutate({ mutation, variables: { input } });
+  return response.data.job;
 }
 
 export { getJobs, getJob, getCompany, createJob };
