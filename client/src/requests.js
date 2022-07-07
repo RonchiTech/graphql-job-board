@@ -59,7 +59,7 @@ async function getJobs() {
       }
     }
   `;
-  const response = await client.query({ query });
+  const response = await client.query({ query, fetchPolicy: 'no-cache' });
   console.log('getJobs: ', response);
   // const responseData = await fetchData(query);
 
