@@ -46,20 +46,64 @@ const client = new ApolloClient({
 //   return responseData;
 // }
 
-async function getJobs() {
-  const query = gql`
-    query GetJobs {
+const jobDetailFragment = gql`
+  fragment JobDetail on Job {
+    id
+    title
+    company {
+      id
+      name
+    }
+    description
+  }
+`;
+
+const getCompanyQuery = gql`
+  query GetCompany($companyId: ID!) {
+    company(id: $companyId) {
+      id
+      name
+      description
       jobs {
         id
         title
-        company {
-          id
-          name
-        }
       }
     }
-  `;
-  const response = await client.query({ query, fetchPolicy: 'no-cache' });
+  }
+`;
+const jobQuery = gql`
+  query JobQuery($jobId: ID!) {
+    job(id: $jobId) {
+      ...JobDetail
+    }
+  }
+  ${jobDetailFragment}
+`;
+const createJobMutation = gql`
+  mutation CreateJob($input: CreateJobInput) {
+    job: createJob(input: $input) {
+      ...JobDetail
+    }
+  }
+  ${jobDetailFragment}
+`;
+const getJobsQuery = gql`
+  query GetJobs {
+    jobs {
+      id
+      title
+      company {
+        id
+        name
+      }
+    }
+  }
+`;
+async function getJobs() {
+  const response = await client.query({
+    query: getJobsQuery,
+    fetchPolicy: 'no-cache',
+  });
   console.log('getJobs: ', response);
   // const responseData = await fetchData(query);
 
@@ -74,39 +118,14 @@ async function getJobs() {
 }
 
 async function getCompany(companyId) {
-  const query = gql`
-    query GetCompany($companyId: ID!) {
-      company(id: $companyId) {
-        id
-        name
-        description
-        jobs {
-          id
-          title
-        }
-      }
-    }
-  `;
-
   // const responseBody = await fetchData(query, { companyId });
   // return responseBody.data.company;
-  const response = await client.query({ query, variables: { companyId } });
+  const response = await client.query({
+    query: getCompanyQuery,
+    variables: { companyId },
+  });
   return response.data.company;
 }
-
-const jobQuery = gql`
-  query JobQuery($jobId: ID!) {
-    job(id: $jobId) {
-      id
-      title
-      company {
-        id
-        name
-      }
-      description
-    }
-  }
-`;
 
 async function getJob(jobId) {
   // const responseBody = await fetchData(query, { jobId });
@@ -119,23 +138,10 @@ async function getJob(jobId) {
 }
 
 async function createJob(input) {
-  const mutation = gql`
-    mutation CreateJob($input: CreateJobInput) {
-      job: createJob(input: $input) {
-        id
-        title
-        description
-        company {
-          id
-          name
-        }
-      }
-    }
-  `;
   // const responseBody = await fetchData(mutation, { input });
   // return responseBody.data.job;
   const response = await client.mutate({
-    mutation,
+    mutation: createJobMutation,
     variables: { input },
     update: (proxy, mutationResult) => {
       // console.log('mutationResult', mutationResult);
