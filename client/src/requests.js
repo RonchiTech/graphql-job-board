@@ -18,8 +18,8 @@ const authLink = new ApolloLink((operation, forward) => {
       },
     });
   }
-  console.log('operation ', operation);
-  console.log('forward ', forward);
+  // console.log('operation ', operation);
+  // console.log('forward ', forward);
   return forward(operation);
 });
 
@@ -73,26 +73,6 @@ async function getJobs() {
   return response.data;
 }
 
-async function getJob(jobId) {
-  const query = gql`
-    query JobQuery($jobId: ID!) {
-      job(id: $jobId) {
-        id
-        title
-        company {
-          id
-          name
-        }
-        description
-      }
-    }
-  `;
-  // const responseBody = await fetchData(query, { jobId });
-  // return responseBody.data.job;
-  const response = await client.query({ query, variables: { jobId } });
-  return response.data.job;
-}
-
 async function getCompany(companyId) {
   const query = gql`
     query GetCompany($companyId: ID!) {
@@ -114,6 +94,30 @@ async function getCompany(companyId) {
   return response.data.company;
 }
 
+const jobQuery = gql`
+  query JobQuery($jobId: ID!) {
+    job(id: $jobId) {
+      id
+      title
+      company {
+        id
+        name
+      }
+      description
+    }
+  }
+`;
+
+async function getJob(jobId) {
+  // const responseBody = await fetchData(query, { jobId });
+  // return responseBody.data.job;
+  const response = await client.query({
+    query: jobQuery,
+    variables: { jobId },
+  });
+  return response.data.job;
+}
+
 async function createJob(input) {
   const mutation = gql`
     mutation CreateJob($input: CreateJobInput) {
@@ -130,7 +134,22 @@ async function createJob(input) {
   `;
   // const responseBody = await fetchData(mutation, { input });
   // return responseBody.data.job;
-  const response = await client.mutate({ mutation, variables: { input } });
+  const response = await client.mutate({
+    mutation,
+    variables: { input },
+    update: (proxy, mutationResult) => {
+      // console.log('mutationResult', mutationResult);
+      //save the newly created job into the cache
+
+      //after creating a new job it will redirect to that specific job, meaning calling the getJob query.
+      //(the query you want to cache is the getJob query)
+      proxy.writeQuery({
+        query: jobQuery,
+        variables: { jobId: mutationResult.data.job.id },
+        data: mutationResult.data,
+      });
+    },
+  });
   return response.data.job;
 }
 
